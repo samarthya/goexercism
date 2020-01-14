@@ -27,6 +27,7 @@ type Teams map [string]*Table
 const Format string = "%-31s| %s |  %s |  %s |  %s |  %s\n"
 const FormatInt string = "%-31s|  %d |  %d |  %d |  %d |  %d\n"
 
+// WriteTally to the writer.
 func (teams Teams) WriteTally(writer io.Writer) {
 
 	fmt.Fprintf(writer, Format, "Team", "MP", "W", "D", "L", "P")
@@ -53,36 +54,6 @@ func (teams Teams) WriteTally(writer io.Writer) {
 	}
 }
 
-// Utility function to Write the structure.
-// func writeStructure(teams Teams, writer io.Writer) {
-// 	// var finalResult [] string = make([]string, 0)
-
-// 	fmt.Fprintf(writer,"%-31s| %s |  %s |  %s |  %s |  %s\n","Team", "MP", "W", "D", "L", "P")
-// 	// fmt.Println( "T: ", teams, n, len(teams))
-
-// 	var sortedKeys [] string
-// 	for k, _:= range teams {
-// 		sortedKeys = append(sortedKeys, k)
-// 	}
-
-// 	sort.Slice(sortedKeys, func(i,j int) bool {
-// 		if teams[sortedKeys[i]].p > teams[sortedKeys[j]].p {
-// 			return true
-// 		} else if teams[sortedKeys[i]].p == teams[sortedKeys[j]].p {
-// 			if strings.Compare(sortedKeys[i], sortedKeys[j]) <= 0 {
-// 				return true
-// 			}
-// 		}
-// 		return false
-// 	})
-
-// 	for _,k := range sortedKeys {
-// 		v := teams[k]
-// 		fmt.Fprintf(writer,"%-31s|  %d |  %d |  %d |  %d |  %d\n", k, v.mp, v.w, v.d, v.l, v.p)
-// 	}
-
-// }
-
 
 /**
  * Package bufio implements buffered I/O. It wraps an io.Reader 
@@ -93,15 +64,14 @@ func (teams Teams) WriteTally(writer io.Writer) {
 func Tally(reader io.Reader, writer io.Writer) error {
 	var teams Teams = make(map[string]*Table)
 	data, err:= ioutil.ReadAll(reader)
-	// fmt.Printf("Input - %s", data)
+
 	if err == nil {
 		// Read the individual line with match and result
 		for _, val := range strings.Split(fmt.Sprintf("%s",data), "\n") {
-			// Allegoric Alaskans;Blithering Badgers;win
+
 			tm := strings.Split(val, ";") 
-			if len(tm) <  3 {
-				// fmt.Println(" Skipping..")
-			}else { //Else not complete data.
+
+			if len(tm) ==  3 {
 				switch tm[2] {
 					case "win":
 						if teams[string(tm[0])] == nil {
@@ -122,10 +92,6 @@ func Tally(reader io.Reader, writer io.Writer) error {
 
 						teams[string(tm[1])].l += 1
 						teams[string(tm[1])].mp += 1
-						// teamA := teams[tm[0]]
-						// teamB := teams[tm[1]]
-						// AdjustWin(&teamA)
-						// AdjustLoss(&teamB)
 						
 					case "loss":
 
@@ -179,6 +145,7 @@ func Tally(reader io.Reader, writer io.Writer) error {
 		if len(teams) == 0 {
 			return errors.New(" no element")
 		}
+		
 		teams.WriteTally(writer)
 	}
 	return nil
