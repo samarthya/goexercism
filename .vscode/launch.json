@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/tournament/",
+            "program": "${workspaceFolder}/house/",
             "env": {},
             "args": []
         }
