@@ -1,5 +1,6 @@
 package secret
 
+//Handshakes identifies the options
 var Handshakes []string = []string{"wink", "double blink", "close your eyes", "jump"}
 
 func reverse(a []string) {
@@ -18,6 +19,7 @@ func reverse(a []string) {
 	}
 }
 
+//Handshake computes the secret handshake
 func Handshake(input uint) (handshake []string) {
 	handshake = make([]string, 0)
 	if input > 0 {

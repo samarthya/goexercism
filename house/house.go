@@ -9,66 +9,107 @@ const (
 	This string = "This is the"
 )
 
-type Character struct {
-	name      string
-	adjective string
-	verb      string
+type Predicate struct {
+	character string
+	predicate string
 }
 
-var Lines map[int]string = map[int]string{
-	0:  "house",
-	1:  "malt",
-	2:  "rat",
-	3:  "cat",
-	4:  "dog",
-	5:  "cow with the crumpled horn",
-	6:  "maiden all forlorn",
-	7:  "man all tattered and torn",
-	8:  "priest all shaven and shorn",
-	9:  "rooster that crowed in the morn",
-	10: "farmer sowing his corn",
-	11: "horse and the hound and the horn",
+type Character struct {
+	adjective string
+	pred      Predicate
 }
-var Actions map[string]string = map[string]string{
-	"house":                            "Jack built.",
-	"malt":                             "lay in the house",
-	"rat":                              "ate the malt",
-	"cat":                              "killed the rat",
-	"dog":                              "worried the cat",
-	"cow with the crumpled horn":       "tossed the dog",
-	"maiden all forlorn":               "milked the cow with the crumpled horn",
-	"man all tattered and torn":        "kissed the maiden all forlorn",
-	"priest all shaven and shorn":      "married the man all tattered and torn",
-	"rooster that crowed in the morn":  "woke the priest all shaven and shorn",
-	"farmer sowing his corn":           "kept the rooster that crowed in the morn",
-	"horse and the hound and the horn": "belonged to the farmer sowing his corn",
+
+var characters map[string]Character = map[string]Character{
+	"house": {adjective: "", pred: Predicate{
+		predicate: "built.", character: "Jack",
+	},
+	},
+	"malt": {adjective: "", pred: Predicate{
+		predicate: "lay in the", character: "house",
+	},
+	},
+	"rat": {adjective: "", pred: Predicate{
+		predicate: "ate the", character: "malt",
+	},
+	},
+	"cat": {adjective: "", pred: Predicate{
+		predicate: "killed the", character: "rat",
+	},
+	},
+	"dog": {adjective: "", pred: Predicate{
+		predicate: "worried the", character: "cat",
+	},
+	},
+	"cow": {adjective: "with the crumpled horn", pred: Predicate{
+		predicate: "tossed the", character: "dog",
+	},
+	},
+	"maiden": {adjective: "all forlorn", pred: Predicate{
+		predicate: "milked the", character: "cow",
+	},
+	},
+	"man": {adjective: "all tattered and torn", pred: Predicate{
+		predicate: "kissed the", character: "maiden",
+	},
+	},
+	"priest": {adjective: "all shaven and shorn", pred: Predicate{
+		predicate: "married the", character: "man",
+	},
+	},
+	"rooster": {adjective: "that crowed in the morn", pred: Predicate{
+		predicate: "woke the", character: "priest",
+	},
+	},
+	"farmer": {adjective: "sowing his corn", pred: Predicate{
+		predicate: "kept the", character: "rooster",
+	},
+	},
+	"horse": {adjective: "and the hound and the horn", pred: Predicate{
+		predicate: "belonged to the", character: "farmer",
+	},
+	},
+}
+
+var verses map[int]string = map[int]string{
+	1: "house",
+	2: "malt",
+	3: "rat",
+	4: "cat",
+	5: "dog",
+	6: "cow", 7: "maiden",
+	8: "man", 9: "priest",
+	10: "rooster", 11: "farmer",
+	12: "horse",
 }
 
 func Verse(stanza int) (verse string) {
 	var v strings.Builder
-
-	stanza -= 1
-	if stanza == 0 {
-		fmt.Fprintf(&v, "%s %s that %s", This, Lines[stanza], Actions[Lines[stanza]])
+	var character string
+	character = verses[stanza]
+	if stanza == 1 {
+		fmt.Fprintf(&v, "%s %s that %s %s", This, character, characters[character].pred.character, characters[character].pred.predicate)
 	} else {
-		/*
-			1. This is the malt
-			   that lay in the house that Jack built.
-			4. This is the cat
-			   that killed the rat
-			   that ate the malt\nthat lay in the house that Jack built.
-		*/
-		for j := stanza; j >= 0; j-- {
+		for j := stanza; j > 0; j-- {
+			character = verses[j]
+			predChar := characters[character].pred.character
 			if j == stanza {
-				fmt.Fprintf(&v, "%s %s\nthat %s", This, Lines[j], Actions[Lines[j]])
-			} else if j == 0 {
-				fmt.Fprintf(&v, " that %s", Actions[Lines[0]])
+				if characters[character].adjective == "" {
+					fmt.Fprintf(&v, "%s %s\nthat %s %s", This, character, characters[character].pred.predicate, characters[character].pred.character)
+				} else {
+					fmt.Fprintf(&v, "%s %s %s\nthat %s %s", This, character, characters[character].adjective, characters[character].pred.predicate, characters[character].pred.character)
+				}
+			} else if j == 1 {
+				fmt.Fprintf(&v, " that %s %s", characters[character].pred.character, characters[character].pred.predicate)
 			} else {
-				fmt.Fprintf(&v, "\nthat %s", Actions[Lines[j]])
+				fmt.Fprintf(&v, "\nthat %s %s", characters[character].pred.predicate, characters[character].pred.character)
+			}
+			if predChar != "" && characters[predChar].adjective != "" {
+				fmt.Fprintf(&v, " %s", characters[predChar].adjective)
 			}
 		}
 	}
-	verse = v.String()
+
+	verse = strings.TrimSpace(v.String())
 	return verse
 }
 

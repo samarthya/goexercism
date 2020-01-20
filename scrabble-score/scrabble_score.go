@@ -1,6 +1,9 @@
 package scrabble
 
-import "strings"
+import (
+	"strings"
+	"unicode"
+)
 
 /**
 Letter                           Value
@@ -12,7 +15,7 @@ K                                  5
 J, X                               8
 Q, Z                               10
 **/
-
+//Score Calculates the word score.
 func Score(wordFormed string) (total int) {
 	total = 0
 	strings.TrimSpace(wordFormed)
@@ -21,10 +24,11 @@ func Score(wordFormed string) (total int) {
 		return total
 	}
 
-	for _, i := range strings.ToUpper(wordFormed) {
+	for _, i := range wordFormed {
+		i = unicode.ToUpper(i)
 		switch i {
 		case 'A', 'E', 'I', 'O', 'U', 'L', 'N', 'R', 'S', 'T':
-			total += 1
+			total++
 		case 'D', 'G':
 			total += 2
 		case 'B', 'C', 'M', 'P':

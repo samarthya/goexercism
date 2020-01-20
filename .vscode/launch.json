@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/house/",
+            "program": "${workspaceFolder}/scrabble-score/",
             "env": {},
             "args": []
         }
