@@ -1,6 +1,6 @@
 package sublist
 
-type Relation string
+export type Relation string
 
 const (
 	EQUAL     Relation = "equal"
