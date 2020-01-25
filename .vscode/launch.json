@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/series/",
+            "program": "${workspaceFolder}/etl",
             "env": {},
             "args": []
         }
