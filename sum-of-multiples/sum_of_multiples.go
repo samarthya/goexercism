@@ -1,29 +1,36 @@
 package summultiples
 
-import "fmt"
+func sumOfFactors(fac, num int, countMap map[int]int) {
 
-func sumOfFactors(fac, num int) (sum int) {
-
-	sum = 0
 	mul := fac
+
+	if fac <= 0 {
+		return
+	}
+
 	for {
-		if mul < num {
-			sum += mul
-			mul += fac
-			continue
-		} else {
+		if fac > num || mul >= num {
 			break
 		}
+		countMap[mul] = mul
+		mul += fac
 	}
-	return sum
 }
 
 // SumMultiples Sum of multiples
 func SumMultiples(number int, multiples ...int) (sum int) {
+	var countMap map[int]int = make(map[int]int)
+	if number <= 0 {
+		return 0
+	}
 
 	for _, val := range multiples {
-		sum += sumOfFactors(val, number)
-		fmt.Println(" sum: ", sum)
+		sumOfFactors(val, number, countMap)
 	}
+
+	for _, val := range countMap {
+		sum += val
+	}
+
 	return sum
 }
