@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/error-handling",
+            "program": "${workspaceFolder}/bank-account",
             "env": {},
             "args": []
         }

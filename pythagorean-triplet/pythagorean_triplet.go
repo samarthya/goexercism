@@ -1,7 +1,5 @@
 package pythagorean
 
-import "fmt"
-
 // Triplet Pythagorean triplet
 type Triplet [3]int
 
@@ -28,21 +26,15 @@ func Range(min, max int) (triples []Triplet) {
 
 // Sum sum.
 func Sum(p int) (triples []Triplet) {
-	triples = make([]Triplet, 0)
 
 	min := 1
 	max := int(p / 2)
+	triples = make([]Triplet, 0)
+	allElements := Range(min, max)
 
-	fmt.Println(min, max)
-	for i := min; i <= max; i++ {
-		for j := i + 1; j <= max; j++ {
-			k := j + 1
-			for k <= max {
-				if ((sq(i) + sq(j)) == sq(k)) && ((i + j + k) == p) {
-					triples = append(triples, Triplet{i, j, k})
-				}
-				k++
-			}
+	for _, v := range allElements {
+		if v[0]+v[1]+v[2] == p {
+			triples = append(triples, v)
 		}
 	}
 	return triples
