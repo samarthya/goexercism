@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/bank-account",
+            "program": "${workspaceFolder}/largest-series-product",
             "env": {},
             "args": []
         }

@@ -1,5 +1,6 @@
 {
     "go.gopath": "/Users/ss670121/sourcebox/learn/golang/exercism/go",
     "go.formatTool": "gofmt",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "git.ignoreLimitWarning": true
 }
