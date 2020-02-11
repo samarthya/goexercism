@@ -2,7 +2,7 @@ package lsproduct
 
 import (
 	"errors"
-	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -11,39 +11,42 @@ import (
 func productCompute(series string, max int) (int, error) {
 	in := strings.Split(series, "")
 
-	result := 0
+	sop := make([]int, 1)
 	out := 1
 	end := len(in)
 
+	sop[0] = 0
+
 	for i := range in {
-		skip := i
-		if (skip + max) <= end {
-			for {
-				o, err := strconv.Atoi(in[skip])
-				if err != nil {
-					return 0, errors.New("digits input must only contain digits")
-				}
-				fmt.Println(" Mul: ", o)
-				out *= o
-				skip++
-				if (skip >= end) || (skip > ((max - 1) + i)) {
-					break
-				}
-			}
-			fmt.Println(" Result: ", out)
-			if out > result {
-				result = out
-			}
-			out = 1
+
+		if (i + max) > end {
+			break
 		}
+
+		newSeries := in[i : max+i]
+
+		for i := range newSeries {
+			o, err := strconv.Atoi(newSeries[i])
+			if err != nil {
+				return 0, errors.New("digits input must only contain digits")
+			}
+			out *= o
+		}
+
+		sop = append(sop, out)
+		out = 1
 	}
 
-	return result, nil
+	sort.Slice(sop, func(i, j int) bool {
+		return sop[i] > sop[j]
+	})
+
+	return sop[0], nil
 }
 
 // LargestSeriesProduct Returns the {max} digit product in the {series} of input number
 func LargestSeriesProduct(series string, max int) (int, error) {
-	if series == "" && len(series) < max || (len(series) < max) {
+	if len(series) < max {
 		return 0, errors.New("span must be smaller than string length")
 	}
 
