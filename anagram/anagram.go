@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+//Checksum
 func sumOfString(s string) (out int) {
 	s = strings.ToLower(s)
 	for _, r := range s {
