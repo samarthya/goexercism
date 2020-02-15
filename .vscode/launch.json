@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/protein-translation",
+            "program": "${workspaceFolder}/anagram",
             "env": {},
             "args": []
         }
