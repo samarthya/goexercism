@@ -4,11 +4,11 @@ import (
 	"strings"
 )
 
-//Checksum
-func sumOfString(s string) (out int) {
+func mapOfRune(s string) (out map[rune]int) {
+	out = make(map[rune]int, 0)
 	s = strings.ToLower(s)
 	for _, r := range s {
-		out += int(r)
+		out[r]++
 	}
 	return
 }
@@ -21,13 +21,24 @@ func Detect(s string, c []string) (result []string) {
 		return
 	}
 
-	oV := sumOfString(s)
+	oMap := mapOfRune(s)
 	for _, v := range c {
-		if len(v) == len(s) {
+		if len(v) == len(s) && !strings.Contains(strings.ToLower(s), strings.ToLower(v)) {
 			// val contains all the characters of s only then
-			if oV == sumOfString(strings.ToLower(v)) {
+			oV := mapOfRune(strings.ToLower(v))
+			found := true
+			for key, val := range oV {
+				if oMap[key] == val {
+					continue
+				}
+				found = false
+				break
+			}
+
+			if found {
 				result = append(result, v)
 			}
+
 		}
 	}
 	return
