@@ -5,32 +5,29 @@ import (
 	"sort"
 )
 
-// input to Build
+// Record Identifies the ID and Parent
 type Record struct {
 	ID, Parent int
 }
 
+// Node defines the node structure
 type Node struct {
 	ID       int
 	Children []*Node
 }
 
+// Build builds the tree.
 func Build(records []Record) (*Node, error) {
 	nrecords := len(records)
 	if nrecords == 0 {
 		return nil, nil
 	}
 
-	// Hold the nodes in a slice,
 	nodes := make([]Node, nrecords)
-	// Helper to detect duplicate Records
 	seen := make([]bool, nrecords)
 
-	// Sort the input by ID so that the resulting Children slices are
-	// also sorted
 	sort.Slice(records, func(i, j int) bool { return records[i].ID < records[j].ID })
 
-	// Now give them IDs and child references
 	for _, r := range records {
 		if err := CheckParent(&r); err != nil {
 			return nil, err
@@ -54,6 +51,7 @@ func Build(records []Record) (*Node, error) {
 	return &nodes[0], nil
 }
 
+// CheckParent Checks the parent.
 func CheckParent(r *Record) error {
 	if r.ID == 0 {
 		if r.Parent == 0 {

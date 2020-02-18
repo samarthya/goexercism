@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/isbn-verifier",
+            "program": "${workspaceFolder}/armstrong-number",
             "env": {},
             "args": []
         }
