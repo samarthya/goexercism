@@ -1,118 +1,68 @@
 package tree
 
 import (
+	"fmt"
 	"sort"
-	"errors"
 )
 
-// From the test cases.
+// input to Build
 type Record struct {
 	ID, Parent int
 }
 
-// Node structure
 type Node struct {
 	ID       int
 	Children []*Node
 }
 
-
-// A recursive approach to check if the new Node to add exists.
-func containsTheNode(tree *Node, nodeId int) bool {
-	if tree == nil {
-		return false
-	} 
-
-	traverse := tree
-	if traverse.ID == nodeId {
-		return true
-	}
-
-	for _, val := range traverse.Children {
-		return containsTheNode(val, nodeId)
-	}
-
-	return false
-}
-
-func addToTheParent(head *Node, newNode *Node, parent int) (*Node, error)  {
-	if head != nil {
-		if head.ID == parent {
-			head.Children = append(head.Children, newNode)
-			children := head.Children
-			sort.Slice(children, func(i,j int) bool {
-				return children[i].ID < children[j].ID
-			})
-			return head, nil
-		} else {
-			for _, val := range head.Children {
-				if val.ID == parent {
-					val.Children = append(val.Children, newNode)
-					children := val.Children
-					sort.Slice(children, func(i,j int) bool {
-						return children[i].ID < children[j].ID
-					})
-					return head, nil
-				}
-			}
-			// No parent found for this child, in the head.
-			return nil, errors.New(" error. ")
-		}
-	} else {
-		// The parent is not yet added.
-		head = &Node { 
-			parent,
-			nil ,
-		}
-
-		return addToTheParent(head, newNode, parent)
-	}
-	return head, nil
-}
-
-// Build - Builds the tree.
-func Build(records []Record) (tree *Node, err error) {
-	// The records only contain an ID number and a parent ID number. 
-	// var newNode *Node
-	
-	if records == nil {
+func Build(records []Record) (*Node, error) {
+	nrecords := len(records)
+	if nrecords == 0 {
 		return nil, nil
 	}
-	
-	// Sort the elements by index.
-	sort.Slice(records, func(i,j int) bool {
-		return records[i].ID < records[j].ID
-	})
 
-	// Iterate through the records and add one by one.
-	for i, v := range records {
+	// Hold the nodes in a slice,
+	nodes := make([]Node, nrecords)
+	// Helper to detect duplicate Records
+	seen := make([]bool, nrecords)
 
-		if containsTheNode(tree, v.ID) {
-			return nil, errors.New(" exists")
+	// Sort the input by ID so that the resulting Children slices are
+	// also sorted
+	sort.Slice(records, func(i, j int) bool { return records[i].ID < records[j].ID })
+
+	// Now give them IDs and child references
+	for _, r := range records {
+		if err := CheckParent(&r); err != nil {
+			return nil, err
 		}
-		
-		if i != v.ID {
-			return nil, errors.New(" non continuous")
+		id := r.ID
+		if id >= nrecords {
+			return nil, fmt.Errorf("id %d is too high", id)
 		}
+		if seen[id] {
+			return nil, fmt.Errorf("duplicate record with id %d", id)
+		}
+		seen[id] = true
+		nodes[id].ID = id
 
-		// Iterate through the records presented.
-		if v.ID == v.Parent {
-			// Root has the parent == id
-			if tree == nil {
-				// Root element found.
-				tree = &Node{v.ID, nil, }
-			}
-		} else {
-
-			if tree == nil {
-				return nil, errors.New(" root not found ")
-			}
-			
-
-			tree, _ = addToTheParent(tree, &Node{v.ID, nil,}, v.Parent)
+		if id != 0 {
+			parent := r.Parent
+			nodes[parent].Children = append(nodes[parent].Children, &nodes[id])
 		}
 	}
 
+	return &nodes[0], nil
+}
 
-	return tree, nil
+func CheckParent(r *Record) error {
+	if r.ID == 0 {
+		if r.Parent == 0 {
+			return nil
+		}
+		return fmt.Errorf("root node has a parent: %d", r.Parent)
+	}
+	if r.Parent < r.ID {
+		return nil
+	}
+	return fmt.Errorf("node %d has a parent with too high ID: %d", r.ID, r.Parent)
 }
