@@ -36,6 +36,7 @@ func Build(records []Record) (*Node, error) {
 		if id >= nrecords {
 			return nil, fmt.Errorf("id %d is too high", id)
 		}
+
 		if seen[id] {
 			return nil, fmt.Errorf("duplicate record with id %d", id)
 		}
