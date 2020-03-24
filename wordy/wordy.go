@@ -4,28 +4,18 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 const (
-	plus = "plus"
-	sub  = "minus"
-	div  = "divided by"
-	mul  = "multiplied by"
-)
-
-const (
-	// PLUS constant
-	PLUS string = `-?\d+\splus\s-?\d*`
-	//SUBTRACT subtracts
-	SUBTRACT = `-?\d+\sminus\s-?\d*`
-	//MULTIPLY subtracts
-	MULTIPLY = `-?\d+\smultiplied\sby\s-?\d*`
-	//DIVIDE subtracts
-	DIVIDE = `-?\d+\sdivided\sby\s-?\d*`
-	//NUMERICQ numeric question
-	NUMERICQ = `-?\d+.$`
 	// NUMBERS all numbers in the system
 	NUMBERS = `-?\d+`
+
+	//Operators Operators
+	Operators = `[\+-/*]?`
+
+	//Question Question
+	Question = `\d+\?$`
 )
 
 // getNum Get the number
@@ -34,137 +24,96 @@ func getNum(n string) (int, error) {
 	return val, err
 }
 
+//isQuestion Check if it is a question
+func isQuestion(q string) bool {
+	question := regexp.MustCompile(Question)
+	return question.Match([]byte(q))
+}
+
 // Answer Answers the statement.
 func Answer(q string) (int, bool) {
-	onlyQuestion := regexp.MustCompile(NUMERICQ)
-	plusQuery := regexp.MustCompile(PLUS)
-	mulQuery := regexp.MustCompile(MULTIPLY)
-	divQuery := regexp.MustCompile(DIVIDE)
-	subQuery := regexp.MustCompile(SUBTRACT)
-	numbersFound := regexp.MustCompile(NUMBERS)
+	var stack []string = make([]string, 0)
+	var sum int = 0
+	numbers := regexp.MustCompile(NUMBERS)
+	operators := regexp.MustCompile(Operators)
 
-	numbers := numbersFound.FindAllString(q, -1)
+	// Matches the query
+	q = strings.TrimSpace(q)
 
-	switch {
-	case len(plusQuery.FindAllString(q, -1)) >= 1:
-		el := plusQuery.FindAllString(q, -1)
-		sum := 0
+	if !isQuestion(q) {
+		return 0, false
+	}
 
-		for _, val := range el {
-			num := numbersFound.FindAllString(val, -1)
-			// Find the 2 numbers to add.
-			if len(num) < 2 {
-				return 0, false
-			}
+	var elements []string = strings.Split(q, " ")
 
-			for _, n := range num {
-				number, err := getNum(n)
-
-				if err != nil {
-					return 0, false
-				}
-
-				sum += number
-
+	for _, v := range elements {
+		switch v {
+		case "plus":
+			stack = append(stack, "+")
+		case "minus":
+			stack = append(stack, "-")
+		case "multiplied":
+			stack = append(stack, "*")
+		case "divided":
+			stack = append(stack, "/")
+		default:
+			n := numbers.FindAllString(v, -1)
+			if len(n) == 1 {
+				stack = append(stack, n[0])
 			}
 		}
-		return sum, true
+	}
 
-	case len(subQuery.FindAllString(q, -1)) >= 1:
-		el := subQuery.FindAllString(q, -1)
-		sum := 0
+	// No valid data found
+	if len(stack) == 0 {
+		return 0, false
+	}
 
-		for _, val := range el {
-			num := numbersFound.FindAllString(val, -1)
-			// Find the 2 numbers to add.
-			if len(num) < 2 {
-				return 0, false
-			}
-
-			for i, n := range num {
-				number, err := getNum(n)
-
-				if err != nil {
-					return 0, false
-				}
-				if i == 0 {
-					sum = number
-				} else {
-					sum -= number
-				}
-
-			}
-		}
-		return sum, true
-	case len(mulQuery.FindAllString(q, -1)) >= 1:
-		el := mulQuery.FindAllString(q, -1)
-		sum := 0
-
-		for _, val := range el {
-			num := numbersFound.FindAllString(val, -1)
-			// Find the 2 numbers to add.
-			if len(num) < 2 {
-				return 0, false
-			}
-
-			for i, n := range num {
-				number, err := getNum(n)
-
-				if err != nil {
-					return 0, false
-				}
-				if i == 0 {
-					sum = number
-				} else {
-					sum *= number
-				}
-
-			}
-		}
-		return sum, true
-	case len(divQuery.FindAllString(q, -1)) >= 1:
-		el := divQuery.FindAllString(q, -1)
-		sum := 0
-
-		for _, val := range el {
-			num := numbersFound.FindAllString(val, -1)
-			// Find the 2 numbers to add.
-			if len(num) < 2 {
-				return 0, false
-			}
-
-			for i, n := range num {
-				number, err := getNum(n)
-
-				if err != nil {
-					return 0, false
-				}
-				if i == 0 {
-					sum = number
-				} else {
-					sum /= number
-				}
-
-			}
-		}
-		return sum, true
-	case len(onlyQuestion.FindAllString(q, -1)) >= 1:
-		el := onlyQuestion.FindAllString(q, -1)
-		if len(el) == 1 {
-
-			// Found elements
-			log.Println(" Elements: ", numbers)
-
-			val, err := getNum(numbers[0])
-
+	for i, el := range stack {
+		// If it is the first element
+		if i == 0 {
+			val, err := getNum(el)
 			if err != nil {
 				return 0, false
 			}
+			sum = val
+		} else {
 
-			return val, true
+			if operators.Match([]byte(el)) {
+				switch el {
+				case "+":
+					val, err := getNum(stack[i+1])
+					if err != nil {
+						return 0, false
+					}
+					sum += val
+				case "-":
+					val, err := getNum(stack[i+1])
+					if err != nil {
+						return 0, false
+					}
+					sum -= val
+				case "/":
+					val, err := getNum(stack[i+1])
+					if err != nil {
+						return 0, false
+					}
+					sum /= val
+				case "*":
+					val, err := getNum(stack[i+1])
+					if err != nil {
+						return 0, false
+					}
+					sum *= val
+				default:
+					if i%2 != 0 {
+						return 0, false
+					}
+				}
+			}
 		}
 	}
-	// Matches the query
 
-	return 0, false
+	log.Println(" Read: ", stack)
+	return sum, true
 }

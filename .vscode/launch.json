@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/wordy",
+            "program": "${workspaceFolder}/say",
             "env": {},
             "args": []
         }
