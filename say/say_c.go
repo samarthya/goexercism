@@ -2,7 +2,6 @@ package say
 
 import (
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -81,27 +80,8 @@ func hundreds(r int) (string, bool) {
 	}
 }
 
-// thousands Allows to calculate the equivalent of thousand and lesser representation.
-func thousands(r int) (string, bool) {
-	switch {
-	case r == 0:
-		return fmt.Sprintf("one %s", myMap[1000]), true
-	case r >= 1 && r <= 10:
-		if val, ok := tens(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000]), true
-		}
-		return "", false
-	case r > 10 && r <= 100:
-		if val, ok := hundreds(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000]), true
-		}
-		return "", false
-	default:
-		return fmt.Sprintf("%s %s", myMap[r], myMap[1000]), true
-	}
-}
-
-func numberConversion(i int) (string, bool) {
+//NumberConversion Converts the number
+func NumberConversion(i int64) (string, bool) {
 	var s strings.Builder
 
 	for i >= 0 {
@@ -109,130 +89,40 @@ func numberConversion(i int) (string, bool) {
 		case i == 0:
 			if len(s.String()) == 0 {
 				if val, ok := tens(int(i)); ok {
-					fmt.Fprintf(&s, "%s ", val)
+					fmt.Fprintf(&s, " %s", val)
 				}
 			}
 			return strings.TrimSpace(s.String()), true
 		case i < 100:
-			if val, ok := tens(i); ok {
+			if val, ok := tens(int(i)); ok {
 				fmt.Fprintf(&s, " %s", val)
 			}
-			return s.String(), true
+			return strings.TrimSpace(s.String()), true
 		case i >= 100 && i < 1000:
 			r := int(i / 100)
 			if val, ok := hundreds(r); ok {
-				fmt.Fprintf(&s, "%s", val)
+				fmt.Fprintf(&s, " %s", val)
 			}
-			i /= 100
+			i %= 100
 		case i >= 1000 && i < 1000000:
 			r := i / 1000
-			if val, ok := numberConversion(r); ok {
-				fmt.Fprintf(&s, "%s %s", val, myMap[1000])
+			if val, ok := NumberConversion(r); ok {
+				fmt.Fprintf(&s, " %s %s", val, myMap[1000])
 			}
-			i /= 1000
+			i %= 1000
 		case i >= 1000000 && i < 1000000000:
 			r := i / 1000000
-			if val, ok := numberConversion(r); ok {
-				fmt.Fprintf(&s, "%s %s", val, myMap[1000000])
+			if val, ok := NumberConversion(r); ok {
+				fmt.Fprintf(&s, " %s %s", val, myMap[1000000])
 			}
-			i /= 1000000
+			i %= 1000000
 		case i >= 1000000000 && i < 1000000000000:
 			r := i / 1000000000
-			if val, ok := numberConversion(r); ok {
+			if val, ok := NumberConversion(r); ok {
 				fmt.Fprintf(&s, "%s %s", val, myMap[1000000000])
 			}
-			i /= 1000000000
+			i %= 1000000000
 		}
 	}
-	return "", false
-}
-
-func million(r int) (string, bool) {
-	switch {
-	case r == 0:
-		return fmt.Sprintf("one %s", myMap[1000000]), true
-	case r >= 1 && r <= 10:
-		if val, ok := tens(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000000]), true
-		}
-		return "", false
-	case r > 10 && r <= 100:
-		if val, ok := hundreds(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000000]), true
-		}
-		return "", false
-	case r > 100 && r <= 1000:
-		if val, ok := thousands(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000000]), true
-		}
-		return "", false
-	default:
-		return fmt.Sprintf("%s %s", myMap[r], myMap[1000]), true
-	}
-}
-
-func billion(r int) (string, bool) {
-	switch {
-	case r == 0:
-		return fmt.Sprintf("one %s", myMap[1000000000]), true
-	case r >= 1 && r <= 10:
-		if val, ok := tens(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000000000]), true
-		}
-		return "", false
-	case r > 10 && r <= 1000:
-		if val, ok := hundreds(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000000000]), true
-		}
-		return "", false
-	case r >= 1000 && r <= 1000000:
-		if val, ok := thousands(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000000000]), true
-		}
-		return "", false
-	case r > 1000000 && r <= 1000000000:
-		if val, ok := million(r); ok {
-			return fmt.Sprintf("%s %s", val, myMap[1000000000]), true
-		}
-		return "", false
-	default:
-		return fmt.Sprintf("%s %s", myMap[r], myMap[1000000000]), true
-	}
-}
-
-//Convert the number
-func Convert(i int64) (string, bool) {
-	var s strings.Builder
-
-	log.Printf(" Ele: %d", i)
-
-	for {
-		switch {
-		case i > 1000:
-		case i >= 100 && i < 1000:
-			r := int(i / 100)
-			if val, ok := hundreds(r); ok {
-				fmt.Fprintf(&s, "%s ", val)
-			}
-			i -= int64(r * 100)
-		case i > 0 && i < 100:
-			if val, ok := tens(int(i)); ok {
-				fmt.Fprintf(&s, "%s ", val)
-			}
-			return strings.TrimSpace(s.String()), true
-		case i == 0:
-			if len(s.String()) == 0 {
-				if val, ok := tens(int(i)); ok {
-					fmt.Fprintf(&s, "%s ", val)
-				}
-			}
-			return strings.TrimSpace(s.String()), true
-		default:
-			if val, ok := myMap[int(i)]; ok {
-				return val, true
-			}
-		}
-	}
-
 	return "", false
 }
