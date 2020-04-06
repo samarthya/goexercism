@@ -7,30 +7,20 @@ import (
 	"strings"
 )
 
-//
-// 1. You must implement a constructor and methods Rows() and Cols() as
-//    described in the README, but Rows() and Cols must return results that
-//    are independent from the original matrix.  That is, you should be able
-//    to do as you please with the results without affecting the matrix.
-//
-// 2. You must implement a method Set(row, col, val) for setting a matrix
-//    element.
-//
-// 3. As usual in Go, you must detect and return error conditions.
+/**
+Not incorrect, but it's worth remembering that a [][]int already is a map[int][]int! 
+In other words, you can think of a [][]int as a data structure that takes an integer 
+index representing a row number, and gives you the slice of int representing the row. 
+So the struct type is unnecessary and simply wraps an existing built-in type that Go already provides.
+*/
 
-// Interfaces are implemented implicitly.
-type IMATRIX interface {
-	Rows() []int
-	Cols() []int
-}
-
-type ArrayOfInts []int
-
+// Matrix rep of Matrix
 type Matrix struct {
-	rows map[int]ArrayOfInts
-	cols map[int]ArrayOfInts
+	rows map[int][]int
+	cols map[int][]int
 }
 
+//Set rep set
 func (m *Matrix) Set(row, col, val int) bool {
 	result := m
 
@@ -46,6 +36,7 @@ func (m *Matrix) Set(row, col, val int) bool {
 	return true
 }
 
+// Rows function Rows
 func (m *Matrix) Rows() (result [][]int) {
 
 	result = make([][]int, len(m.rows))
@@ -61,6 +52,7 @@ func (m *Matrix) Rows() (result [][]int) {
 	return result
 }
 
+// Cols the columns
 func (m *Matrix) Cols() (result [][]int) {
 
 	result = make([][]int, len(m.cols))
@@ -78,10 +70,10 @@ func (m *Matrix) Cols() (result [][]int) {
 	return result
 }
 
-// Constructor
+// New Allows you to contruct
 func New(input string) (*Matrix, error) {
 	fmt.Println("\n", input)
-	matrix := &Matrix{rows: make(map[int]ArrayOfInts, 0), cols: make(map[int]ArrayOfInts, 0)}
+	matrix := &Matrix{rows: make(map[int][]int, 0), cols: make(map[int][]int, 0)}
 
 	if input == "" || len(input) == 0 {
 		return nil, errors.New(" invalid input")
@@ -93,14 +85,14 @@ func New(input string) (*Matrix, error) {
 			// Time to break the space separated column values.
 			val, err := strconv.Atoi(strings.TrimSpace(row))
 			if err != nil {
-				return nil, errors.New(" cannot convert.")
+				return nil, errors.New(" cannot convert")
 			}
 
 			matrix.cols[i] = append(matrix.cols[i], val)
 			matrix.rows[j] = append(matrix.rows[j], val)
 		}
 		if (j > 0) && len(matrix.rows[j-1]) != len(matrix.rows[j]) {
-			return nil, errors.New(" inequal rows length.")
+			return nil, errors.New(" inequal rows length")
 		}
 	}
 
