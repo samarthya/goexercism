@@ -1,0 +1,37 @@
+package cars
+
+import "log"
+
+const (
+	Ninety  = 5
+	Seventy = 9
+	Speed   = 221
+)
+
+// CalculateProductionRatePerHour for the assembly line, taking into account
+// its success rate
+func CalculateProductionRatePerHour(speed int) float64 {
+	switch {
+	case speed < Ninety:
+		return float64(speed * Speed)
+	case speed < Seventy:
+		return .90 * float64((speed * Speed))
+	case speed >= Seventy:
+		fallthrough
+	default:
+		log.Println("77%")
+		return .77 * float64((speed * Speed))
+	}
+}
+
+// CalculateProductionRatePerMinute describes how many working items are
+// produced by the assembly line every minute
+func CalculateProductionRatePerMinute(speed int) int {
+	return int(CalculateProductionRatePerHour(speed) / 60)
+}
+
+// successRate is used to calculate the ratio of an item being created without
+// error for a given speed
+func successRate(speed int) float64 {
+	return float64((speed * Speed) / 60)
+}
