@@ -1,4 +1,4 @@
-package dna
+fpackage dna
 
 import (
 	"errors"

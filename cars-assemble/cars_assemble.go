@@ -8,6 +8,8 @@ const (
 	Speed   = 221
 )
 
+
+
 // CalculateProductionRatePerHour for the assembly line, taking into account
 // its success rate
 func CalculateProductionRatePerHour(speed int) float64 {
